@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 import libcst
 
 from src.utils import get_module_path, make_module_attr
+from src.utils.code import get_code_for_node
 from src.utils.module import get_full_module_name
 
 if TYPE_CHECKING:
@@ -13,6 +14,7 @@ if TYPE_CHECKING:
 class ImportTransformer(libcst.CSTTransformer):
     def __init__(self, file_path: Path, root_dir: Path):
         super().__init__()
+        self.changes = []
         self.file_path = file_path
         self.root_dir = root_dir
         self.modified = False
@@ -48,7 +50,9 @@ class ImportTransformer(libcst.CSTTransformer):
 
         new_module_str = ".".join(full_parts)
         self.modified = True
-        return updated_node.with_changes(
+        new_node = updated_node.with_changes(
             module=make_module_attr(new_module_str),
             relative=[],
         )
+        self.changes.append((get_code_for_node(original_node), get_code_for_node(new_node)))
+        return new_node

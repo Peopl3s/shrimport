@@ -28,7 +28,7 @@ class ImportFormatter:
                 or not file_path.name.endswith(".py")
                 or any(pat.search(str(file_path)) for pat in self.ignore_patterns)
             ):
-                self.logger.debug(f"ignored: {file_path};")
+                self.logger.log_ignored(file_path)
                 continue
 
             scanned += 1
@@ -46,10 +46,12 @@ class ImportFormatter:
 
         if transformer.modified:
             if self.is_dry_run:
-                self.logger.warning(f"disapproved: {file_path};")
+                self.logger.log_disapproved(file_path=file_path)
             else:
-                self.logger.warning(f"changed {file_path};")
+                self.logger.log_file_changed(file_path=file_path)
                 file_path.write_text(modified_tree.code, encoding="utf-8")
+            for change in transformer.changes:
+                self.logger.log_changes(from_code=change[0], to_code=change[1])
             return True
-        self.logger.debug(f"approved {file_path};")
+        self.logger.log_approved(file_path)
         return False
