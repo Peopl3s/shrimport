@@ -7,7 +7,7 @@
     </p>
     <p>
         <img src="https://img.shields.io/github/v/release/lyova24/shrimport" alt="Latest Release">
-        <img src="https://img.shields.io/github/last-commit/lyova24/shrimport/main" alt="Latest Commit">
+        <img src="https://img.shields.io/github/last-commit/lyova24/shrimport/master" alt="Latest Commit">
     </p>
     <p>
         <img src="https://github.com/lyova24/shrimport/actions/workflows/unit-test.yml/badge.svg?branch=main" alt="Workflow status badge" loading="lazy" height="20">
@@ -16,6 +16,9 @@
 
 </div>
 
+----
+
+- Used for **PR** in [django_mongodb_backend](https://github.com/mongodb/django-mongodb-backend/pull/415/files)
 
 ----
 
