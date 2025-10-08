@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import TYPE_CHECKING, List, Tuple
+from typing import TYPE_CHECKING
 
 import libcst
 
@@ -12,12 +12,12 @@ if TYPE_CHECKING:
 
 
 class ImportTransformer(libcst.CSTTransformer):
-    def __init__(self, file_path: Path, root_dir: Path) -> None:
+    def __init__(self, file_path: Path, root_dir: Path):
         super().__init__()
-        self.changes: List[Tuple[str, str]] = []
-        self.file_path: Path = file_path
-        self.root_dir: Path = root_dir
-        self.modified: bool = False
+        self.changes = []
+        self.file_path = file_path
+        self.root_dir = root_dir
+        self.modified = False
 
     def leave_ImportFrom(
         self,
@@ -27,30 +27,30 @@ class ImportTransformer(libcst.CSTTransformer):
         if not original_node.relative:
             return original_node
 
-        level: int = len(original_node.relative) if original_node.relative else 0
-        current_module: str | None = get_module_path(self.file_path, self.root_dir)
+        level = len(original_node.relative) if original_node.relative else 0
+        current_module = get_module_path(self.file_path, self.root_dir)
         if current_module is None:
             return original_node
 
-        current_parts: List[str] = current_module.split(".")
+        current_parts = current_module.split(".")
         if level > len(current_parts):
             print(f"warn: level {level} too deep in {self.file_path}")
             return original_node
 
-        base_parts: List[str] = current_parts[:-level]
+        base_parts = current_parts[:-level]
         if original_node.module:
-            module_name: str = get_full_module_name(original_node.module)
+            module_name = get_full_module_name(original_node.module)
             full_parts = base_parts + module_name.split(".")
         else:
             full_parts = base_parts
 
-        package_parts: List[str] = current_parts[:-1]
+        package_parts = current_parts[:-1]
         if full_parts[: len(package_parts)] == package_parts:
             return original_node
 
-        new_module_str: str = ".".join(full_parts)
+        new_module_str = ".".join(full_parts)
         self.modified = True
-        new_node: "ImportFrom" = updated_node.with_changes(
+        new_node = updated_node.with_changes(
             module=make_module_attr(new_module_str),
             relative=[],
         )

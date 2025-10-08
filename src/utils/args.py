@@ -1,9 +1,8 @@
 import argparse
-from typing import List
 
 
 def get_args() -> argparse.Namespace:
-    parser: argparse.ArgumentParser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser()
     parser.add_argument(
         "-R",
         "--root-dir",

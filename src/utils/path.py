@@ -18,6 +18,6 @@ def get_module_path(file_path: Path, root_dir: Path) -> str | None:
     return ".".join(relative_path.parts)
 
 
-def exit_if_path_is_not_a_dir(path: Path) -> None:
+def exit_if_path_is_not_a_dir(path: Path):
     if not path.is_dir():
         exit(f"path {path} is not a directory.")
