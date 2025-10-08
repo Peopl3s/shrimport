@@ -6,6 +6,7 @@ repos:
         entry: python -m main
         language: python
         additional_dependencies: [ libcst>=1.0.0 ]
+        files: \.py$
         args:
           - "--verbose"
 
