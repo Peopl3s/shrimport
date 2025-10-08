@@ -1,5 +1,6 @@
 from pathlib import Path
 from re import compile
+from typing import List, Pattern
 
 import libcst as cst
 
@@ -11,17 +12,18 @@ from .import_transformer import ImportTransformer
 
 
 class ImportFormatter:
-    def __init__(self, config: Config):
+    def __init__(self, config: Config) -> None:
         self.logger = get_logger()
-        self.root_dir = get_path_from_str(config.root_dir).resolve()
-        self.file_paths = get_paths_from_list(config.file_paths)
-        self.ignore_patterns = list(set([compile(pattern) for pattern in config.ignored_paths]))
-        self.is_dry_run = config.is_dry_run
+        self.root_dir: Path = get_path_from_str(config.root_dir).resolve()
+        self.file_paths: List[Path] = get_paths_from_list(config.file_paths)
+        self.ignore_patterns: List[Pattern] = list(set([compile(pattern) for pattern in config.ignored_paths]))
+        self.is_dry_run: bool = config.is_dry_run
         exit_if_path_is_not_a_dir(self.root_dir)
 
     def convert_relative_imports(self) -> int:
-        exit_code = 0
-        scanned, changed = 0, 0
+        exit_code: int = 0
+        scanned: int = 0
+        changed: int = 0
         for file_path in self.file_paths:
             if (
                 not file_path.is_file()
@@ -38,11 +40,11 @@ class ImportFormatter:
         return exit_code
 
     def _convert_imports(self, file_path: Path) -> bool:
-        source = file_path.read_text(encoding="utf-8")
-        tree = cst.parse_module(source)
+        source: str = file_path.read_text(encoding="utf-8")
+        tree: cst.Module = cst.parse_module(source)
 
-        transformer = ImportTransformer(file_path, self.root_dir)
-        modified_tree = tree.visit(transformer)
+        transformer: ImportTransformer = ImportTransformer(file_path, self.root_dir)
+        modified_tree: cst.Module = tree.visit(transformer)
 
         if transformer.modified:
             if self.is_dry_run:
@@ -53,5 +55,5 @@ class ImportFormatter:
             for change in transformer.changes:
                 self.logger.log_changes(from_code=change[0], to_code=change[1])
             return True
-        self.logger.log_approved(file_path)
+        self.logger.log_approved(str(file_path))
         return False
